@@ -1,6 +1,9 @@
 {
     "name": "ci-observability-workshop",
     "private": true,
-    "version": "0.0.1"
+    "version": "0.0.1",
+    "devDependencies": {
+      "prettier": "^3.3.3"
+    }
   }
   
