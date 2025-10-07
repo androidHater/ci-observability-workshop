@@ -14,54 +14,47 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 🟢 Nastavení Node.js
+      # 1) PNPM nejdřív, aby existoval binárka v PATH
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      # 2) Až teď Node + cache:'pnpm' (teď už pnpm existuje)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
 
-      # 🔧 Instalace pnpm (globálně)
-      - name: Install pnpm
-        run: |
-          npm install -g pnpm@9
-          pnpm --version
-
-      # 📦 Instalace závislostí
       - name: Install
         run: make i
 
-      # 🧹 Lint + Typecheck
       - name: Lint & Typecheck
         run: make fmt && make lint && make typecheck
 
-      # 🧪 Testy
       - name: Test
         run: make test
 
-      # 🏗️ Build
       - name: Build
         run: make build
 
-      # 🐳 Build Docker image (lokální tag)
       - name: Build Docker image (local tag)
         run: |
           IMAGE="ghcr.io/${{ github.repository }}:${{ github.sha }}"
           echo "${IMAGE}" > image.txt
           docker build -t "${IMAGE}" app
 
-      # 📦 Uložení image jako TAR
       - name: Save image as TAR
         run: |
           IMAGE=$(cat image.txt)
           docker save "${IMAGE}" -o image.tar
 
-      # ⬆️ Upload image.tar jako artefakt
       - name: Upload image.tar
         uses: actions/upload-artifact@v4
         with:
@@ -69,7 +62,6 @@ jobs:
           path: image.tar
           retention-days: 7
 
-      # 🚀 Push do GHCR při tagu
       - name: Push to GHCR on tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
