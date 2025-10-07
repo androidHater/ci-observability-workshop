@@ -19,18 +19,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 🔧 Nastavení Node.js + cache pro pnpm
+      # 🟢 Nastavení Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
 
-      # 🧰 Aktivace Corepacku (pnpm)
-      - name: Setup pnpm
+      # 🔧 Instalace pnpm (globálně)
+      - name: Install pnpm
         run: |
-          corepack enable
-          corepack prepare pnpm@9.7.0 --activate
+          npm install -g pnpm@9
           pnpm --version
 
       # 📦 Instalace závislostí
