@@ -4,7 +4,7 @@ services:
     build: ./app
     ports: ["3000:3000"]
     environment:
-      - NODE_ENV=production
+       - NODE_OPTIONS=--experimental-specifier-resolution=node
     depends_on: [metrics-server]
 
   metrics-server:
