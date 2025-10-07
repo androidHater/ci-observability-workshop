@@ -46,7 +46,8 @@ jobs:
 
       - name: Build Docker image (local tag)
         run: |
-          IMAGE="ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/${REPO_LC}:${{ github.sha }}"
           echo "${IMAGE}" > image.txt
           docker build -t "${IMAGE}" app
 
@@ -65,7 +66,8 @@ jobs:
       - name: Push to GHCR on tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          IMAGE="ghcr.io/${{ github.repository }}:${GITHUB_REF#refs/tags/}"
+          REPO_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/${REPO_LC}:${GITHUB_REF#refs/tags/}"
           docker tag $(cat image.txt) "${IMAGE}"
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
           docker push "${IMAGE}"
