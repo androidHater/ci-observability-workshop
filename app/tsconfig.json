@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "ESNext",
     "target": "ES2022",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "outDir": "dist",
     "baseUrl": ".",
     "experimentalDecorators": true,
