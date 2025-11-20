@@ -1,0 +1,39 @@
+name: Simple CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Tady klidně použijeme jen npm, ať je to fakt jednoduché
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: npm ci
+        working-directory: ./app
+
+      - name: Lint
+        run: npm run lint
+        working-directory: ./app
+
+      - name: Test
+        run: npm test
+        working-directory: ./app
+
+      - name: Build
+        run: npm run build
+        working-directory: ./app
