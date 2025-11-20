@@ -1,39 +1,46 @@
-name: Simple CI
+name: CI
 
 on:
   workflow_dispatch:
+  
   push:
     branches: [ main ]
-  pull_request:
+    tags: ["v*.*.*"]
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Tady klidně použijeme jen npm, ať je to fakt jednoduché
-      - name: Setup Node
+      # 1) PNPM nejdřív, aby existoval binárka v PATH
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      # 2) Až teď Node + cache:'pnpm' (teď už pnpm existuje)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
-      - name: Install deps
-        run: npm ci
-        working-directory: ./app
+      - name: Install
+        run: make i
 
-      - name: Lint
-        run: npm run lint
-        working-directory: ./app
+      - name: Lint & Typecheck
+        run: make fmt && make lint && make typecheck
 
       - name: Test
-        run: npm test
-        working-directory: ./app
+        run: make test
 
       - name: Build
-        run: npm run build
-        working-directory: ./app
+        run: make build
